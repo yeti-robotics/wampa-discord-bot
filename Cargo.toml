@@ -5,3 +5,5 @@ authors = ["Sam Perlmutter <sam.perlmutter227@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+serenity = "0.8.6"
+dotenv = "0.15.0"
