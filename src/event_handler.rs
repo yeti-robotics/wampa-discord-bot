@@ -1,9 +1,9 @@
 use serenity::prelude::*;
-use serenity::model::{ channel::Message, gateway::Ready };
+use serenity::model::{ channel::Message, gateway::Ready, id::GuildId, guild::Member, id::ChannelId };
 
-use crate::command::Command;
+use crate::command::{ Command, COMMAND_PREFIX };
 
-const COMMAND_PREFIX: &str = "?";
+pub const WELCOME_CHANNEL_ID: u64 = 713798567810302004;
 
 pub struct Handler;
 
@@ -27,6 +27,18 @@ impl EventHandler for Handler {
 
         if let Err(err) = cmd.exec(ctx, msg) {
             println!("{}", err);
+        }
+    }
+
+    fn guild_member_addition(&self, ctx: Context, _guild_id: GuildId, new_member: Member) {
+        let welcome_channel = ChannelId(WELCOME_CHANNEL_ID);
+        let welcome_msg = format!(
+            "Welcome, <@{}>! Please choose your roles by tapping the emoji in the above message. \
+            Then, set your name by typing `?name <yourName>`. For example, if your name is Wampa, you would type `?name Wampa`. \
+            Once you set your name, you will be able to see everyone else in the server.",
+            new_member.user_id().0);
+        if let Err(why) = welcome_channel.say(&ctx.http, welcome_msg) {
+            println!("Error sending message: {:?}", why);
         }
     }
 }

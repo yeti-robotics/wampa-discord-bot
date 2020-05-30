@@ -1,7 +1,11 @@
 use serenity::prelude::*;
-use serenity::model::channel::Message;
+use serenity::model::{ channel::Message, id::RoleId };
 
-use crate::event_handler::WampaError;
+use crate::event_handler::{ WampaError, WELCOME_CHANNEL_ID };
+
+pub const COMMAND_PREFIX: &str = "?";
+const MEMBER_ROLE_ID: u64 = 716352880940023820;
+const ROLES_MESSAGE_ID: u64 = 716358973464510505;
 
 pub enum Command {
     Name(String)
@@ -28,6 +32,15 @@ impl Command {
                     .guild(guild_id)
                     .ok_or(WampaError::InternalServerError("Error finding guild".to_string()))?;
                 guild.read().edit_member(&ctx.http, msg.author.id, |m| m.nickname(name))?;
+
+                if msg.channel_id.0 == WELCOME_CHANNEL_ID {
+                    let mut msgs = msg.channel_id.messages(&ctx.http, |ret| ret.before(msg.id))?;
+                    msgs.push(msg.clone());
+                    msg.channel_id.delete_messages(&ctx.http, msgs.iter().filter(|m| m.id != ROLES_MESSAGE_ID))?;
+
+                    let roles = vec![RoleId(MEMBER_ROLE_ID)];
+                    guild.read().edit_member(&ctx.http, msg.author.id, |m| m.roles(roles))?;
+                }
             }
         }
 
