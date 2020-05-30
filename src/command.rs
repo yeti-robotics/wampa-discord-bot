@@ -1,11 +1,9 @@
+use std::env;
+
 use serenity::prelude::*;
 use serenity::model::{ channel::Message, id::RoleId };
 
-use crate::event_handler::{ WampaError, WELCOME_CHANNEL_ID };
-
-pub const COMMAND_PREFIX: &str = "?";
-const MEMBER_ROLE_ID: u64 = 716352880940023820;
-const ROLES_MESSAGE_ID: u64 = 716358973464510505;
+use crate::event_handler::WampaError;
 
 pub enum Command {
     Name(String)
@@ -33,12 +31,12 @@ impl Command {
                     .ok_or(WampaError::InternalServerError("Error finding guild".to_string()))?;
                 guild.read().edit_member(&ctx.http, msg.author.id, |m| m.nickname(name))?;
 
-                if msg.channel_id.0 == WELCOME_CHANNEL_ID {
+                if msg.channel_id.0 == env::var("WELCOME_CHANNEL_ID")?.parse::<u64>()? {
                     let mut msgs = msg.channel_id.messages(&ctx.http, |ret| ret.before(msg.id))?;
                     msgs.push(msg.clone());
-                    msg.channel_id.delete_messages(&ctx.http, msgs.iter().filter(|m| m.id != ROLES_MESSAGE_ID))?;
+                    msg.channel_id.delete_messages(&ctx.http, msgs.iter().filter(|m| m.id != env::var("WELCOME_MESSAGE_ID").unwrap().parse::<u64>().unwrap()))?;
 
-                    let roles = vec![RoleId(MEMBER_ROLE_ID)];
+                    let roles = vec![RoleId(env::var("MEMBER_ROLE_ID")?.parse::<u64>()?)];
                     guild.read().edit_member(&ctx.http, msg.author.id, |m| m.roles(roles))?;
                 }
             }
