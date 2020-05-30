@@ -1,4 +1,5 @@
 mod event_handler;
+mod command;
 
 use std::env;
 use dotenv::dotenv;
