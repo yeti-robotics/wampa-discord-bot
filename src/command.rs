@@ -14,10 +14,9 @@ impl Command {
         let msg = s.chars()
             .skip(1)
             .collect::<String>();
-        let params = msg.split_whitespace()
-            .collect::<Vec<&str>>();
-        match params[0] {
-            "name" => Ok(Command::Name(params[1].to_string())),
+        let mut params = msg.split_whitespace();
+        match params.next().unwrap() {
+            "name" => Ok(Command::Name(params.collect::<Vec<&str>>().join(" "))),
             _ => Err(WampaError::InvalidCmd("Invalid command".to_string()))
         }
     }
