@@ -33,7 +33,7 @@ impl Command {
                 if msg.channel_id.0 == env::var("WELCOME_CHANNEL_ID")?.parse::<u64>()? {
                     let mut msgs = msg.channel_id.messages(&ctx.http, |ret| ret.before(msg.id))?;
                     msgs.push(msg.clone());
-                    msg.channel_id.delete_messages(&ctx.http, msgs.iter().filter(|m| m.id != env::var("WELCOME_MESSAGE_ID").unwrap().parse::<u64>().unwrap()))?;
+                    msg.channel_id.delete_messages(&ctx.http, msgs)?;
 
                     let roles = vec![RoleId(env::var("MEMBER_ROLE_ID")?.parse::<u64>()?)];
                     guild.read().edit_member(&ctx.http, msg.author.id, |m| m.roles(roles))?;
