@@ -30,17 +30,18 @@ impl EventHandler for Handler {
         }
     }
 
-    // fn guild_member_addition(&self, ctx: Context, _guild_id: GuildId, new_member: Member) {
-    //     let welcome_channel = ChannelId(env::var("WELCOME_CHANNEL_ID").unwrap().parse::<u64>().unwrap());
-    //     let welcome_msg = format!(
-    //         "Welcome, <@{}>! Please choose your roles by tapping the emoji in the above message. \
-    //         Then, set your name by typing `?name <yourName>`. For example, if your name is Wampa, you would type `?name Wampa`. \
-    //         Once you set your name, you will be able to see everyone else in the server.",
-    //         new_member.user_id().0);
-    //     if let Err(why) = welcome_channel.say(&ctx.http, welcome_msg) {
-    //         println!("Error sending message: {:?}", why);
-    //     }
-    // }
+    fn guild_member_addition(&self, ctx: Context, _guild_id: GuildId, new_member: Member) {
+        let welcome_channel = ChannelId(env::var("WELCOME_CHANNEL_ID").unwrap().parse::<u64>().unwrap());
+        let welcome_msg = format!(
+            "Welcome, <@{}>, to the YETI Discord! Please let us know your name by typing `?name <yourName>`. \
+            For example, if your name is Wampa, you'd type `?name Wampa`. \
+            Once you do that, you can head over to <#{}> to let us know what you do/want to do on the team.",
+            new_member.user_id().0,
+            env::var("ROLE_CHANNEL_ID").unwrap());
+        if let Err(why) = welcome_channel.say(&ctx.http, welcome_msg) {
+            println!("Error sending message: {:?}", why);
+        }
+    }
 }
 
 pub enum WampaError {
