@@ -31,7 +31,11 @@ impl Command {
                 guild.read().edit_member(&ctx.http, msg.author.id, |m| m.nickname(name))?;
 
                 if msg.channel_id.0 == env::var("WELCOME_CHANNEL_ID")?.parse::<u64>()? {
-                    let mut msgs = msg.channel_id.messages(&ctx.http, |ret| ret.before(msg.id))?;
+                    let mut msgs = msg.channel_id.messages(&ctx.http, |ret| ret.before(msg.id))?
+                        .iter()
+                        .filter(|m| m.content.contains(&msg.author.id.0.to_string()) || &m.author.id == &msg.author.id)
+                        .cloned()
+                        .collect::<Vec<Message>>();
                     msgs.push(msg.clone());
                     msg.channel_id.delete_messages(&ctx.http, msgs)?;
 
