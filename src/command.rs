@@ -24,6 +24,7 @@ impl Command {
     pub fn exec(&self, ctx: Context, msg: Message) -> Result<(), WampaError> {
         match &self {
             Command::Name(name) => {
+                println!("{:#?}", msg);
                 let guild_id  = msg.guild_id.ok_or(WampaError::InternalServerError("Error finding guild id".to_string()))?;
                 let guild = ctx.cache.read()
                     .guild(guild_id)
@@ -41,7 +42,7 @@ impl Command {
 
                     let roles = vec![RoleId(env::var("MEMBER_ROLE_ID")?.parse::<u64>()?)];
                     guild.read().edit_member(&ctx.http, msg.author.id, |m| m.roles(roles))?;
-                }
+                } 
             }
         }
 
