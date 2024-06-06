@@ -30,6 +30,7 @@ impl Command {
                     .guild(guild_id)
                     .ok_or(WampaError::InternalServerError("Error finding guild".to_string()))?;
                 guild.read().edit_member(&ctx.http, msg.author.id, |m| m.nickname(name))?;
+                println!("{:#?}", guild_id);
 
                 if msg.channel_id.0 == env::var("WELCOME_CHANNEL_ID")?.parse::<u64>()? {
                     let mut msgs = msg.channel_id.messages(&ctx.http, |ret| ret.before(msg.id))?
