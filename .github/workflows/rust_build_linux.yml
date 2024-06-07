@@ -1,9 +1,6 @@
 name: Rust Build
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:
@@ -17,15 +14,18 @@ jobs:
       uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
-        target: x86_64-unknown-linux-gnu
+        target: x86_64-unknown-linux-musl
         profile: minimal
         override: true
+
+    - name: Install musl-tools
+      run: sudo apt-get update && sudo apt-get install -y musl-tools
 
     - name: Build
       uses: actions-rs/cargo@v1
       with:
         command: build
-        args: --target x86_64-unknown-linux-gnu
+        args: --target x86_64-unknown-linux-musl
 
     - name: Upload artifact
       uses: actions/upload-artifact@v2
