@@ -38,7 +38,10 @@ impl Command {
                         .collect::<Vec<Message>>();
                     msgs.push(msg.clone());
                     msg.channel_id.delete_messages(&ctx.http, msgs).await?;
-                    let roles = vec![RoleId::new(env::var("MEMBER_ROLE_ID")?.parse::<u64>()?)];
+                    let roles = vec![
+                        RoleId::new(env::var("MEMBER_ROLE_ID")?.parse::<u64>()?),
+                        RoleId::new(env::var("ROOKIE_ROLE_ID")?.parse::<u64>()?)
+                    ];
                     guild_id.edit_member(&ctx.http, msg.author.id, EditMember::new().roles(roles)).await?;
                 }
             }

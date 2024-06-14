@@ -3,7 +3,7 @@ mod command;
 
 use std::env;
 use dotenv::dotenv;
-use serenity::{all::GatewayIntents, async_trait, Client};
+use serenity::{all::GatewayIntents, Client};
 
 #[tokio::main]
 async fn main() {

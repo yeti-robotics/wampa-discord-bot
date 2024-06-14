@@ -1,7 +1,7 @@
 use std::env;
 
 use serenity::{async_trait, prelude::*};
-use serenity::model::{ channel::Message, gateway::Ready, id::GuildId, guild::Member, id::ChannelId };
+use serenity::model::{ channel::Message, gateway::Ready, guild::Member, id::ChannelId };
 
 use crate::command::Command;
 
@@ -34,8 +34,8 @@ impl EventHandler for Handler {
     async fn guild_member_addition(&self, ctx: Context, new_member: Member) {
         let welcome_channel = ChannelId::new(env::var("WELCOME_CHANNEL_ID").unwrap().parse::<u64>().unwrap());
         let welcome_msg = format!(
-            "Welcome, <@{}>, to the YETI Discord! Please let us know your name by typing `?name <yourName>`. \
-            For example, if your name is Wampa, you'd type `?name Wampa`. \
+            "Welcome, <@{}>, to the YETI Discord! Please let us know your first and last name by typing `?name <yourName>`. \
+            For example, if your name is Wampa Robotson, you'd type `?name Wampa Robotson`. \
             Once you do that, you can head over to <#{}> to let us know what you do/want to do on the team.",
             new_member.user.id,
             env::var("ROLE_CHANNEL_ID").unwrap());
@@ -60,7 +60,7 @@ impl<E: std::error::Error> From<E> for WampaError {
 impl std::fmt::Display for WampaError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            WampaError::InternalServerError(msg) => write!(f, "Internal server error, contact the Slack Master: {}", msg),
+            WampaError::InternalServerError(msg) => write!(f, "Internal server error: {}", msg),
             WampaError::InvalidCmd(help_text) => write!(f, "{}", help_text),
         }
     }

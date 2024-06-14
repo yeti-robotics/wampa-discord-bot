@@ -1,4 +1,4 @@
-name: Rust Build
+name: Rust Build Release
 
 on:
   workflow_dispatch:
@@ -22,10 +22,10 @@ jobs:
       uses: actions-rs/cargo@v1
       with:
         command: build
-        args: --target x86_64-unknown-linux-gnu
+        args: --target x86_64-unknown-linux-gnu --release
 
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
         name: wampa
-        path: target/x86_64-unknown-linux-gnu/debug/wampa
+        path: target/x86_64-unknown-linux-gnu/release/wampa
