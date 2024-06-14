@@ -3,15 +3,17 @@ mod command;
 
 use std::env;
 use dotenv::dotenv;
-use serenity::Client;
+use serenity::{all::GatewayIntents, async_trait, Client};
 
-fn main() {
+#[tokio::main]
+async fn main() {
     dotenv().ok();
 
     let token = env::var("DISCORD_TOKEN").expect("Discord token env var not set");
-    let mut client = Client::new(&token, event_handler::Handler).expect("Error creating client");
+    let intents = GatewayIntents::GUILD_MEMBERS | GatewayIntents::GUILD_MESSAGES | GatewayIntents::MESSAGE_CONTENT;
+    let mut client = Client::builder(&token, intents).event_handler(event_handler::Handler).await.expect("Error creating client");
 
-    if let Err(err) = client.start() {
+    if let Err(err) = client.start().await {
         println!("Client error: {:?}", err);
     }
 }

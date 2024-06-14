@@ -1,18 +1,19 @@
 use std::env;
 
-use serenity::prelude::*;
+use serenity::{async_trait, prelude::*};
 use serenity::model::{ channel::Message, gateway::Ready, id::GuildId, guild::Member, id::ChannelId };
 
 use crate::command::Command;
 
 pub struct Handler;
 
+#[async_trait]
 impl EventHandler for Handler {
-    fn ready(&self, _ctx: Context, _data_about_bot: Ready) {
+    async fn ready(&self, _ctx: Context, _data_about_bot: Ready) {
         println!("Successfully connected!");
     }
 
-    fn message(&self, ctx: Context, msg: Message) {
+    async fn message(&self, ctx: Context, msg: Message) {
         if !msg.content.starts_with(&env::var("COMMAND_PREFIX").unwrap()) {
             return;
         }
@@ -25,25 +26,26 @@ impl EventHandler for Handler {
             }
         };
 
-        if let Err(err) = cmd.exec(ctx, msg) {
+        if let Err(err) = cmd.exec(ctx, msg).await {
             println!("{}", err);
         }
     }
 
-    fn guild_member_addition(&self, ctx: Context, _guild_id: GuildId, new_member: Member) {
-        let welcome_channel = ChannelId(env::var("WELCOME_CHANNEL_ID").unwrap().parse::<u64>().unwrap());
+    async fn guild_member_addition(&self, ctx: Context, new_member: Member) {
+        let welcome_channel = ChannelId::new(env::var("WELCOME_CHANNEL_ID").unwrap().parse::<u64>().unwrap());
         let welcome_msg = format!(
             "Welcome, <@{}>, to the YETI Discord! Please let us know your name by typing `?name <yourName>`. \
             For example, if your name is Wampa, you'd type `?name Wampa`. \
             Once you do that, you can head over to <#{}> to let us know what you do/want to do on the team.",
-            new_member.user_id().0,
+            new_member.user.id,
             env::var("ROLE_CHANNEL_ID").unwrap());
-        if let Err(why) = welcome_channel.say(&ctx.http, welcome_msg) {
+        if let Err(why) = welcome_channel.say(&ctx.http, welcome_msg).await {
             println!("Error sending message: {:?}", why);
         }
     }
 }
 
+#[derive(Debug)]
 pub enum WampaError {
     InternalServerError(String),
     InvalidCmd(String),

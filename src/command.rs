@@ -1,5 +1,6 @@
 use std::env;
 
+use serenity::all::{EditMember, GetMessages};
 use serenity::prelude::*;
 use serenity::model::{ channel::Message, id::RoleId };
 
@@ -21,29 +22,25 @@ impl Command {
         }
     }
 
-    pub fn exec(&self, ctx: Context, msg: Message) -> Result<(), WampaError> {
+    pub async fn exec(&self, ctx: Context, msg: Message) -> Result<(), WampaError> {
         match &self {
             Command::Name(name) => {
                 println!("{:#?}", msg);
                 let guild_id  = msg.guild_id.ok_or(WampaError::InternalServerError("Error finding guild id".to_string()))?;
-                let guild = ctx.cache.read()
-                    .guild(guild_id)
-                    .ok_or(WampaError::InternalServerError("Error finding guild".to_string()))?;
-                guild.read().edit_member(&ctx.http, msg.author.id, |m| m.nickname(name))?;
+                guild_id.edit_member(&ctx.http, msg.author.id, EditMember::new().nickname(name)).await?;
                 println!("{:#?}", guild_id);
 
-                if msg.channel_id.0 == env::var("WELCOME_CHANNEL_ID")?.parse::<u64>()? {
-                    let mut msgs = msg.channel_id.messages(&ctx.http, |ret| ret.before(msg.id))?
+                if msg.channel_id.get() == env::var("WELCOME_CHANNEL_ID")?.parse::<u64>()? {
+                    let mut msgs = msg.channel_id.messages(&ctx.http, GetMessages::new().before(msg.id)).await?
                         .iter()
-                        .filter(|m| m.content.contains(&msg.author.id.0.to_string()) || &m.author.id == &msg.author.id)
+                        .filter(|m| m.content.contains(&msg.author.id.to_string()) || &m.author.id == &msg.author.id)
                         .cloned()
                         .collect::<Vec<Message>>();
                     msgs.push(msg.clone());
-                    msg.channel_id.delete_messages(&ctx.http, msgs)?;
-
-                    let roles = vec![RoleId(env::var("MEMBER_ROLE_ID")?.parse::<u64>()?)];
-                    guild.read().edit_member(&ctx.http, msg.author.id, |m| m.roles(roles))?;
-                } 
+                    msg.channel_id.delete_messages(&ctx.http, msgs).await?;
+                    let roles = vec![RoleId::new(env::var("MEMBER_ROLE_ID")?.parse::<u64>()?)];
+                    guild_id.edit_member(&ctx.http, msg.author.id, EditMember::new().roles(roles)).await?;
+                }
             }
         }
 
