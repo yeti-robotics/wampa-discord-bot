@@ -5,7 +5,7 @@ RUN git clone https://github.com/samperlmutter/wampa.git  .
 
 RUN cargo build --release
 
-FROM alpine:latest
+FROM ubuntu:latest
 
 COPY --from=builder /usr/src/wampa/target/release/wampa /usr/local/bin/wampa
 
