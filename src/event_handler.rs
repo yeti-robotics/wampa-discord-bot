@@ -34,7 +34,7 @@ impl EventHandler for Handler {
     async fn guild_member_addition(&self, ctx: Context, new_member: Member) {
         let welcome_channel = ChannelId::new(env::var("WELCOME_CHANNEL_ID").unwrap().parse::<u64>().unwrap());
         let welcome_msg = format!(
-            "Welcome, <@{}>, to the YETI Discord! Please let us know your first and last name by typing `?name <yourName>`. \
+            "Welcome, <@{}>, to the YETI Discord! Please let us know your first and last name by typing `?name yourName`. \
             For example, if your name is Wampa Robotson, you'd type `?name Wampa Robotson`. \
             Once you do that, you can head over to <#{}> to let us know what you do/want to do on the team.",
             new_member.user.id,
