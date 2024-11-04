@@ -1,7 +1,7 @@
 FROM rust:latest as builder
 
 WORKDIR /usr/src/wampa
-RUN git clone https://github.com/samperlmutter/wampa.git  .
+COPY . .
 
 RUN cargo build --release
 
