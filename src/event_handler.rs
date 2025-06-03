@@ -33,12 +33,10 @@ impl EventHandler for Handler {
 
     async fn guild_member_addition(&self, ctx: Context, new_member: Member) {
         let welcome_channel = ChannelId::new(env::var("WELCOME_CHANNEL_ID").unwrap().parse::<u64>().unwrap());
-        let welcome_msg = format!(
-            "Welcome, <@{}>, to the YETI Discord! Please let us know your first and last name by typing `?name yourName`. \
-            For example, if your name is Wampa Robotson, you'd type `?name Wampa Robotson`. \
-            Once you do that, you can head over to <#{}> to let us know what you do/want to do on the team.",
-            new_member.user.id,
-            env::var("ROLE_CHANNEL_ID").unwrap());
+        let raw_msg = env::var("WELCOME_MESSAGE").unwrap_or_else(|_| "Welcome, <@USER_ID>, to the YETI Discord! Please let us know your first and last name by typing `?name yourName`. For example, if your name is Wampa Robotson, you'd type `?name Wampa Robotson`. Once you do that, you can head over to <#ROLE_CHANNEL_ID> to let us know what you do/want to do on the team.".to_string());
+        let welcome_msg = raw_msg
+            .replace("<@USER_ID>", &format!("<@{}>", new_member.user.id))
+            .replace("<#ROLE_CHANNEL_ID>", &format!("<#{}>", env::var("ROLE_CHANNEL_ID").unwrap()));
         if let Err(why) = welcome_channel.say(&ctx.http, welcome_msg).await {
             println!("Error sending message: {:?}", why);
         }
