@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  publish-web:
+  publish:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -37,7 +37,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: apps/web/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
