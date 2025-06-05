@@ -10,7 +10,7 @@ FROM ubuntu:latest
 COPY --from=builder /usr/src/wampa/target/release/wampa /usr/local/bin/wampa
 
 ENV DISCORD_TOKEN=""
-ENV COMMAND_PREFIX=""
+ENV COMMAND_PREFIX="?"
 ENV WELCOME_CHANNEL_ID=""
 ENV ROLE_CHANNEL_ID=""
 ENV MEMBER_ROLE_ID=""
