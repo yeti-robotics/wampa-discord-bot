@@ -8,24 +8,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Set up Rust
-      uses: actions-rs/toolchain@v1
+      uses: dtolnay/rust-toolchain@stable
       with:
-        toolchain: stable
-        target: x86_64-unknown-linux-gnu
-        profile: minimal
-        override: true
+        targets: x86_64-unknown-linux-gnu
 
     - name: Build
-      uses: actions-rs/cargo@v1
-      with:
-        command: build
-        args: --target x86_64-unknown-linux-gnu --release
+      run: cargo build --target x86_64-unknown-linux-gnu --release
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: wampa
         path: target/x86_64-unknown-linux-gnu/release/wampa
